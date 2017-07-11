@@ -12,8 +12,8 @@ import {
   View
 } from 'react-native';
 
-
-import bluetoothSerial from 'react-native-bluetooth-serial'
+import DialogBox from 'react-native-dialogbox';
+import bluetoothSerial from 'react-native-bluetooth-serial';
 import MyScene from './Scenes/Control';
 import GetControllers from './Scenes/GetControllers';
 export default class AwesomeProject extends Component {
@@ -24,7 +24,8 @@ export default class AwesomeProject extends Component {
             selected:0,
             id:'',
             isEnabled: false,
-            devices: []
+            devices: [],
+            text:''
         };
         //this will fire when a data comes
 
@@ -42,7 +43,7 @@ export default class AwesomeProject extends Component {
                 this.setState({ isEnabled, devices })
 
             });
-        bluetoothSerial.on('read', (data) => console.log(data));
+        bluetoothSerial.on('data', (data) => this.setState({text:"Received data from on"}));
         bluetoothSerial.on('bluetoothEnabled', () => console.log("bluetoothEnabled"));
         bluetoothSerial.on('bluetoothDisabled', () => console.log('Bluetooth disabled'));
         bluetoothSerial.on('error', (err) => console.log(`Error: ${err.message}`));
@@ -50,10 +51,15 @@ export default class AwesomeProject extends Component {
         bluetoothSerial.on('connectionLost', () => {
             console.log("connection lost");
         });
-        bluetoothSerial.withDelimiter('\r').then((res)=>{
+       /* bluetoothSerial.withDelimiter('\r').then((res)=>{
             console.log("delimiter setup",res);
             bluetoothSerial.on('read',(data)=>{
-                console.log('read',data);
+                this.setState({text:data})
+            });
+        });*/
+        bluetoothSerial.subscribe('\r').then((res)=> {
+            bluetoothSerial.on('read', (data)=> {
+                this.setState({text: "subscribe method"})
             });
         });
     }
@@ -64,19 +70,35 @@ export default class AwesomeProject extends Component {
 
         //initialize map to zero
 
+        /*bluetoothSerial.connect("50:F0:D3:FF:15:F9")
+            .then((res) => {
+                console.log('device');
 
-        //bluetoothSerial.readFromDevice().then((data) => {console.log(data)});
+            })
+            .catch((err) =>  console.log(err));
+        //bluetoothSerial.readFromDevice().then((data) => {console.log(data)});*/
 
+        //console.log('device');
 
+        /*bluetoothSerial.pairDevice("50:F0:D3:FF:15:F9")
+            .then((paired) => {
+                console.log(paired);
+            })
+            .catch((err) => console.log(err));
+        */
+        bluetoothSerial.connect("20:16:06:15:47:03")
+                .then((res) => {
+                    this.setState({text:"success"});
+                })
+                .catch((err) => this.setState({text:"error in the hall catch connect "}));
     }
     handleControl(){
         console.log("In handlecontrol");
-        bluetoothSerial.write("String kj")
+        bluetoothSerial.write("0")
             .then((res) => {
                 console.log("string");
             })
-            .catch((err) => console.log(err));
-
+            .catch((err) => console.log(err.message));
         bluetoothSerial.isConnected()
             .then((res) => console.log(res))
             .catch((err) => console.log(err));
@@ -86,7 +108,7 @@ export default class AwesomeProject extends Component {
         </View>;
         switch (this.state.selected){
             case 0:
-                view=<MyScene handleLearn={this.handleLearn} handleControl={this.handleControl}/>
+                view=<MyScene text={this.state.text} handleLearn={this.handleLearn} handleControl={this.handleControl}/>
                 break;
             case 1:
                 view=<GetControllers handleControl={this.handleControl}/>

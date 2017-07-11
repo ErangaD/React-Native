@@ -12,6 +12,7 @@
     "react-native": "0.44.0",
     "react-native-bluetooth-serial": "^1.0.0-rc1",
     "react-native-button": "^2.0.0",
+    "react-native-dialogbox": "^0.6.6",
     "react-native-easy-grid": "^0.1.13",
     "react-navigation": "^1.0.0-beta.11"
   },

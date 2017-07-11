@@ -5,6 +5,7 @@ export default class MyScene extends Component {
     render() {
         return (
             <View>
+                <Text>{this.props.text}</Text>
                 <Button
                     style={styles.learningButton}
                     styleDisabled={{color: 'red'}}
