@@ -18,6 +18,12 @@ export default class MyScene extends Component {
                     onPress={() => this.props.handleControl()}>
                     Control Mode
                 </Button>
+                <Button
+                    style={styles.connectButton}
+                    styleDisabled={{color: 'red'}}
+                    onPress={() => this.props.createConnection()}>
+                    Connect
+                </Button>
 
             </View>
         )
@@ -35,8 +41,11 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#333333'
     },
-    remoteButton:{
-        //numbers from 1 to 10
+    connectButton:{
+        fontSize: 20,
+        textAlign: 'center',
+        color: '#FFA500',
+        margin: 100
     },
     welcome: {
         fontSize: 20,
