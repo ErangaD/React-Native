@@ -1,24 +1,34 @@
 import React, { Component } from 'react';
 import { View, Text, Navigator,StyleSheet,TouchableHighlight } from 'react-native';
-import Button from 'react-native-button';
 import { Col, Row, Grid } from "react-native-easy-grid";
-export default class MyScene extends Component {
+export default class Sender extends Component {
     constructor(){
         super();
         this.state={
             name:'',
-            selected:0
+            selected:'Select the button'
         };
         this.change=this.change.bind(this);
+        this.goBack=this.goBack.bind(this);
     }
     change(e){
         //send the data according to the number
+        this.setState({selected:e});
+        this.props.sendData(e);
+    }
+    goBack(){
+        this.props.goToInitialScene();
     }
     render() {
         return (
             <Grid>
                 <Row >
-                    <Text style={{textAlign:'center',fontSize:40}}>Select the button</Text>
+                    <Col style={{backgroundColor:'white'}}>
+                        <Text style={{color:'#6A6969',fontSize: 46}}>{this.state.selected}</Text>
+                    </Col>
+                    <Col style={styles.column1} onPress={(e)=>this.goBack()}>
+                        <Text style={styles.backButton}>Back</Text>
+                    </Col>
                 </Row>
                 <Row style={{backgroundColor:'red'}}>
                     <TouchableHighlight style={styles.column1} onPress={(e)=>this.change(1)} >
@@ -39,7 +49,7 @@ export default class MyScene extends Component {
                 </Row>
                 <Row style={{backgroundColor:'red'}}>
                     <TouchableHighlight style={styles.column} onPress={(e)=>this.change(4)}>
-                        <Col style={styles.column} onPress={this.change}>
+                        <Col style={styles.column}>
                             <Text style={styles.controlButton}>4</Text>
                         </Col>
                     </TouchableHighlight>
@@ -56,7 +66,7 @@ export default class MyScene extends Component {
                 </Row>
                 <Row style={{backgroundColor:'red'}}>
                     <TouchableHighlight style={styles.column1} onPress={(e)=>this.change(7)}>
-                        <Col style={styles.column1} onPress={this.change}>
+                        <Col style={styles.column1} >
                             <Text style={styles.controlButton}>7</Text>
                         </Col>
                     </TouchableHighlight>
@@ -97,6 +107,10 @@ const styles = StyleSheet.create({
     learningButton:{
         fontSize: 40,
         textAlign: 'center'
+    },
+    backButton:{
+        fontSize: 46,
+        color: '#FFA500'
     },
     controlButton:{
         fontSize: 40,

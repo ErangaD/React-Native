@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { View, Text, Navigator,StyleSheet } from 'react-native';
 import Button from 'react-native-button';
 export default class MyScene extends Component {
+
     render() {
         return (
             <View>
@@ -22,7 +23,7 @@ export default class MyScene extends Component {
                     style={styles.connectButton}
                     styleDisabled={{color: 'red'}}
                     onPress={() => this.props.createConnection()}>
-                    Connect
+                    {this.props.command}
                 </Button>
 
             </View>

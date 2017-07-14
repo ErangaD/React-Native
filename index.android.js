@@ -9,12 +9,14 @@ import {
   AppRegistry,
   StyleSheet,
   Navigator,
-  View
+  View,
+  AsyncStorage
 } from 'react-native';
 
 import bluetoothSerial from 'react-native-bluetooth-serial';
 import InitialScene from './Scenes/Control';
-import GetControllers from './Scenes/GetControllers';
+import Sender from './Scenes/GetControllers';
+import DataCollector from './Scenes/SetControll';
 export default class AwesomeProject extends Component {
     constructor(){
         super();
@@ -24,101 +26,137 @@ export default class AwesomeProject extends Component {
             id:'',
             isEnabled: false,
             devices: [],
-            text:''
+            text:'',
+            connected:false,
+            command:'Connect',
+            storeArray:[],
+            index:0
         };
         this.handleLearn=this.handleLearn.bind(this);
         this.handleControl=this.handleControl.bind(this);
         this.createConnection = this.createConnection.bind(this);
+        this.goToInitialScene = this.goToInitialScene.bind(this);
+        this.storeTheArray = this.storeTheArray.bind(this);
+        this.setIndex = this.setIndex.bind(this);
+        this.sendData = this.sendData.bind(this);
     }
     createConnection (){
         //connecting to the specific mac address
-        bluetoothSerial.connect("20:16:06:15:47:03")
+        if(this.state.connected){
+            bluetoothSerial.disconnect()
+                .then((res) => {
+                    this.setState({text:"success"});
+                })
+                .catch((err) => this.setState({text:"error in the hall catch connect "}));
+        }else{
+            bluetoothSerial.connect("20:16:06:15:47:03")
+                .then((res) => {
+                    this.setState({text:"success"});
+                })
+                .catch((err) => this.setState({text:"error in the hall catch connect "}));
+        }
+        /*try {
+            AsyncStorage.setItem('@MySuperStore:key', 'I like to save it.');
+            console.log("lk");
+        } catch (error) {
+            console.log(error);
+        }*/
+
+    }
+
+    setIndex(index){
+        console.log("in the set index"+index);
+        this.setState({index:index});
+    }
+
+    storeTheArray(data){
+        console.log("in the store array"+data.data);
+        var array = this.state.storeArray;
+        array[this.state.index] = data.data;
+    }
+
+    sendData(e){
+        //var index = this.state.index;
+        var data = this.state.storeArray[e];
+        console.log("send data"+ data);
+        bluetoothSerial.write(data)
             .then((res) => {
-                this.setState({text:"success"});
+                console.log("sent data" + res);
             })
-            .catch((err) => this.setState({text:"error in the hall catch connect "}));
+            .catch((err) => console.log(err.message));
     }
     componentWillMount () {
-        Promise.all([
-                bluetoothSerial.isEnabled(),
-                bluetoothSerial.list()
-            ])
-            .then((values) => {
-                const [ isEnabled, devices ] = values;
-                this.setState({ isEnabled, devices })
+        /*bluetoothSerial.on('data', (data) => {
 
-            });
-        bluetoothSerial.on('data', (data) => this.setState(console.log(data)));
+            console.log("data came "+ data);
+            if(this.state.selected === 1){
+                console.log(" in the sending mode");
+            }else if(this.state.selected === 2){
+                //learn mode
+                console.log(" in the learning mode");
+                this.storeTheArray(data);
+            }
+        });*/
         bluetoothSerial.on('bluetoothEnabled', () => console.log("bluetoothEnabled"));
         bluetoothSerial.on('bluetoothDisabled', () => console.log('Bluetooth disabled'));
         bluetoothSerial.on('error', (err) => console.log(`Error: ${err.message}`));
-        bluetoothSerial.on('connectionSuccess', () => console.log("connectionSuccess"));
+        bluetoothSerial.on('connectionSuccess', () => this.setState({connected:true, command:'Disconnect'}));
         bluetoothSerial.on('connectionLost', () => {
-            console.log("connection lost");
+            this.setState({connected:false ,command:'Connect'})
         });
-       /* bluetoothSerial.withDelimiter('\r').then((res)=>{
-            console.log("delimiter setup",res);
+       bluetoothSerial.withDelimiter('\n').then((res)=>{
+
             bluetoothSerial.on('read',(data)=>{
-                this.setState({text:data})
+                console.log(data);
+                console.log("data came "+ data);
+                if(this.state.selected === 1){
+                    console.log(" in the sending mode");
+                }else if(this.state.selected === 2){
+                    //learn mode
+                    console.log(" in the learning mode");
+                    this.storeTheArray(data);
+                }
+            });
+        });
+        /*bluetoothSerial.subscribe('\n').then((res)=> {
+            bluetoothSerial.on('read', (data)=> {
+                console.log(data);
             });
         });*/
-        bluetoothSerial.subscribe('\r').then((res)=> {
-            bluetoothSerial.on('read', (data)=> {
-                this.setState({text: "subscribe method"})
-            });
-        });
     }
     handleLearn(){
-        //this.setState({selected:1});
-
-        //send the "learn" string
-
-        //initialize map to zero
-
-        /*bluetoothSerial.connect("50:F0:D3:FF:15:F9")
-            .then((res) => {
-                console.log('device');
-
-            })
-            .catch((err) =>  console.log(err));
-        //bluetoothSerial.readFromDevice().then((data) => {console.log(data)});*/
-
-        //console.log('device');
-
-        /*bluetoothSerial.pairDevice("50:F0:D3:FF:15:F9")
-            .then((paired) => {
-                console.log(paired);
-            })
-            .catch((err) => console.log(err));
-        */
-        bluetoothSerial.write("1")
-            .then((res) => {
-                console.log("learn mode sent 1" + res);
-            })
-            .catch((err) => console.log(err.message));
+        /*try {
+            const value = AsyncStorage.getItem('@MySuperStore:key');
+            console.log(value);
+            if (value !== null){
+                // We have data!!
+                console.log(value);
+            }
+        } catch (error) {
+            console.log(error);
+        }*/
+        this.setState({selected:2});
 
     }
     handleControl(){
-        bluetoothSerial.write("0")
-            .then((res) => {
-                console.log("control mode sent 0" + res);
-            })
-            .catch((err) => console.log(err.message));
-        bluetoothSerial.isConnected()
-            .then((res) => console.log(res))
-            .catch((err) => console.log(err));
+        this.setState({selected:1});
     }
+    goToInitialScene(){
+        this.setState({selected:0});
+    }
+
     render() {
         let view=<View>
         </View>;
         switch (this.state.selected){
             case 0:
-                view=<InitialScene text={this.state.text} handleLearn={this.handleLearn} handleControl={this.handleControl} createConnection={this.createConnection}/>
+                view=<InitialScene command={this.state.command} text={this.state.text} handleLearn={this.handleLearn} handleControl={this.handleControl} createConnection={this.createConnection}/>
                 break;
             case 1:
-                view=<GetControllers handleControl={this.handleControl}/>
+                view=<Sender goToInitialScene={this.goToInitialScene} sendData={this.sendData} />
                 break;
             case 2:
+                view=<DataCollector goToInitialScene={this.goToInitialScene} setIndex={this.setIndex}/>
                 break;
         }
         return (
