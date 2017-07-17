@@ -13,7 +13,17 @@ export default class Sender extends Component {
     }
     change(e){
         //send the data according to the number
-        this.setState({selected:e});
+        if(e===0 ){
+            this.setState({selected:"POWER BUTTON"});
+        } else if( e === 11){
+            this.setState({selected:"MUTE"});
+        }else if(e === 10) {
+            this.setState({selected:"0"});
+        }
+        else{
+            this.setState({selected:e});
+        }
+
         this.props.sendData(e);
     }
     goBack(){
@@ -84,7 +94,7 @@ export default class Sender extends Component {
                 <Row>
                     <TouchableHighlight style={styles.column} onPress={(e)=>this.change(0)}>
                         <Col style={styles.column}>
-                            <Text style={styles.controlButton}>ON</Text>
+                            <Text style={styles.controlButton}>ON/OFF</Text>
                         </Col>
                     </TouchableHighlight>
                     <TouchableHighlight style={styles.column1} onPress={(e)=>this.change(10)}>
@@ -95,7 +105,7 @@ export default class Sender extends Component {
 
                     <TouchableHighlight style={styles.column} onPress={(e)=>this.change(11)}>
                         <Col style={styles.column}>
-                            <Text style={styles.controlButton}>OFF</Text>
+                            <Text style={styles.controlButton}>MUTE</Text>
                         </Col>
                     </TouchableHighlight>
                 </Row>

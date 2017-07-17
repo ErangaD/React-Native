@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { View, Text, Navigator,StyleSheet } from 'react-native';
 import Button from 'react-native-button';
 export default class MyScene extends Component {
-
+    //initial view
     render() {
         return (
             <View>
-                <Text>{this.props.text}</Text>
+                <Text>{""}</Text>
                 <Button
                     style={styles.learningButton}
                     styleDisabled={{color: 'red'}}

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { View, Text, Navigator,StyleSheet,TouchableHighlight } from 'react-native';
-import Button from 'react-native-button';
 import { Col, Row, Grid } from "react-native-easy-grid";
 export default class DataCollector extends Component {
     constructor(){
@@ -14,7 +13,16 @@ export default class DataCollector extends Component {
     }
     change(e){
         //send the data according to the number
-        this.setState({selected:e});
+        if( e === 0 ){
+            this.setState({selected:"POWER BUTTON"});
+        } else if( e === 11){
+            this.setState({selected:"MUTE"});
+        }else if(e === 10) {
+            this.setState({selected:"0"});
+        }
+        else{
+            this.setState({selected:e});
+        }
         this.props.setIndex(e);
     }
     goBack(){
@@ -85,7 +93,7 @@ export default class DataCollector extends Component {
                 <Row>
                     <TouchableHighlight style={styles.column} onPress={(e)=>this.change(0)}>
                         <Col style={styles.column}>
-                            <Text style={styles.controlButton}>ON</Text>
+                            <Text style={styles.controlButton}>ON/OFF</Text>
                         </Col>
                     </TouchableHighlight>
                     <TouchableHighlight style={styles.column1} onPress={(e)=>this.change(10)}>
@@ -96,7 +104,7 @@ export default class DataCollector extends Component {
 
                     <TouchableHighlight style={styles.column} onPress={(e)=>this.change(11)}>
                         <Col style={styles.column}>
-                            <Text style={styles.controlButton}>OFF</Text>
+                            <Text style={styles.controlButton}>MUTE</Text>
                         </Col>
                     </TouchableHighlight>
                 </Row>
@@ -104,6 +112,7 @@ export default class DataCollector extends Component {
         )
     }
 }
+//css for the application
 const styles = StyleSheet.create({
     learningButton:{
         fontSize: 40,

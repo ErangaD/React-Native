@@ -47,21 +47,14 @@ export default class AwesomeProject extends Component {
                 .then((res) => {
                     this.setState({text:"success"});
                 })
-                .catch((err) => this.setState({text:"error in the hall catch connect "}));
+                .catch((err) => this.setState({text:"error when disconnecting bluetooth"}));
         }else{
             bluetoothSerial.connect("20:16:06:15:47:03")
                 .then((res) => {
                     this.setState({text:"success"});
                 })
-                .catch((err) => this.setState({text:"error in the hall catch connect "}));
+                .catch((err) => this.setState({text:"error when connecting to the bluetooth"}));
         }
-        /*try {
-            AsyncStorage.setItem('@MySuperStore:key', 'I like to save it.');
-            console.log("lk");
-        } catch (error) {
-            console.log(error);
-        }*/
-
     }
 
     setIndex(index){
@@ -70,33 +63,28 @@ export default class AwesomeProject extends Component {
     }
 
     storeTheArray(data){
-        console.log("in the store array"+data.data);
+        //store the data
         var array = this.state.storeArray;
         array[this.state.index] = data.data;
+        this.setState({storeArray:array});
     }
 
     sendData(e){
-        //var index = this.state.index;
-        var data = this.state.storeArray[e];
-        console.log("send data"+ data);
-        bluetoothSerial.write(data)
-            .then((res) => {
-                console.log("sent data" + res);
-            })
-            .catch((err) => console.log(err.message));
+        try {
+            var data = this.state.storeArray[e];
+            bluetoothSerial.write(data)
+                .then((res) => {
+                    console.log("sent data" + res);
+                })
+                .catch((err) => console.log(err.message));
+        }
+        catch(err) {
+            console.log(err.message);
+        }
+
     }
     componentWillMount () {
-        /*bluetoothSerial.on('data', (data) => {
 
-            console.log("data came "+ data);
-            if(this.state.selected === 1){
-                console.log(" in the sending mode");
-            }else if(this.state.selected === 2){
-                //learn mode
-                console.log(" in the learning mode");
-                this.storeTheArray(data);
-            }
-        });*/
         bluetoothSerial.on('bluetoothEnabled', () => console.log("bluetoothEnabled"));
         bluetoothSerial.on('bluetoothDisabled', () => console.log('Bluetooth disabled'));
         bluetoothSerial.on('error', (err) => console.log(`Error: ${err.message}`));
@@ -118,28 +106,16 @@ export default class AwesomeProject extends Component {
                 }
             });
         });
-        /*bluetoothSerial.subscribe('\n').then((res)=> {
-            bluetoothSerial.on('read', (data)=> {
-                console.log(data);
-            });
-        });*/
     }
     handleLearn(){
-        /*try {
-            const value = AsyncStorage.getItem('@MySuperStore:key');
-            console.log(value);
-            if (value !== null){
-                // We have data!!
-                console.log(value);
-            }
-        } catch (error) {
-            console.log(error);
-        }*/
-        this.setState({selected:2});
-
+        if(this.state.connected){
+            this.setState({selected:2});
+        }
     }
     handleControl(){
-        this.setState({selected:1});
+        if(this.state.connected){
+            this.setState({selected:1});
+        }
     }
     goToInitialScene(){
         this.setState({selected:0});
