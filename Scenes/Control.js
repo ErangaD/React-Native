@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { View, Text, Navigator,StyleSheet } from 'react-native';
+import { View, Text, TextInput, Navigator,StyleSheet,Picker } from 'react-native';
 import Button from 'react-native-button';
+import ModalPicker from 'react-native-modal-picker'
 export default class MyScene extends Component {
     //initial view
     render() {
@@ -19,13 +20,22 @@ export default class MyScene extends Component {
                     onPress={() => this.props.handleControl()}>
                     Control Mode
                 </Button>
+                <ModalPicker
+                    data={this.props.devices}
+                    onChange={(option)=>{ this.props.createConnection(option)}}
+                    >
+                    <TextInput
+                        style={styles.search}
+                        editable={false}
+                        placeholder={this.props.command}
+                        />
+                    </ModalPicker>
                 <Button
                     style={styles.connectButton}
                     styleDisabled={{color: 'red'}}
-                    onPress={() => this.props.createConnection()}>
-                    {this.props.command}
+                    onPress={() => this.props.searchPairedDevices()}>
+                    Search
                 </Button>
-
             </View>
         )
     }
@@ -35,18 +45,24 @@ const styles = StyleSheet.create({
         fontSize: 40,
         textAlign: 'center',
         margin: 100,
-        marginTop:200
+        marginTop:150
     },
     controlButton:{
         fontSize: 40,
         textAlign: 'center',
         color: '#333333'
     },
+    search:{
+        fontSize: 20,
+        textAlign: 'center',
+        color: '#FFA500',
+        margin: 30
+    },
     connectButton:{
         fontSize: 20,
         textAlign: 'center',
         color: '#FFA500',
-        margin: 100
+        margin: 10
     },
     welcome: {
         fontSize: 20,

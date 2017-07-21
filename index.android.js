@@ -10,13 +10,16 @@ import {
   StyleSheet,
   Navigator,
   View,
-  AsyncStorage
+  AsyncStorage,
+    Picker,
+    Text
 } from 'react-native';
 
 import bluetoothSerial from 'react-native-bluetooth-serial';
 import InitialScene from './Scenes/Control';
 import Sender from './Scenes/GetControllers';
 import DataCollector from './Scenes/SetControll';
+import Bluetooth from './Scenes/BluetoothPicker';
 export default class AwesomeProject extends Component {
     constructor(){
         super();
@@ -30,7 +33,9 @@ export default class AwesomeProject extends Component {
             connected:false,
             command:'Connect',
             storeArray:[],
-            index:0
+            index:0,
+            language:''
+
         };
         this.handleLearn=this.handleLearn.bind(this);
         this.handleControl=this.handleControl.bind(this);
@@ -39,8 +44,27 @@ export default class AwesomeProject extends Component {
         this.storeTheArray = this.storeTheArray.bind(this);
         this.setIndex = this.setIndex.bind(this);
         this.sendData = this.sendData.bind(this);
+        this.searchPairedDevices = this.searchPairedDevices.bind(this);
     }
-    createConnection (){
+    searchPairedDevices(){
+        Promise.all([
+                bluetoothSerial.list()
+            ])
+            .then((values) => {
+                console.log(values);
+                let devices = values[0];
+                let connectedDevices = [];
+                devices.forEach(function (item,index) {
+                    let obj = {
+                        key: item.id,
+                        label: item.name
+                    };
+                    connectedDevices.push(obj);
+                });
+                this.setState({ devices:connectedDevices });
+            });
+    }
+    createConnection (option){
         //connecting to the specific mac address
         if(this.state.connected){
             bluetoothSerial.disconnect()
@@ -49,7 +73,7 @@ export default class AwesomeProject extends Component {
                 })
                 .catch((err) => this.setState({text:"error when disconnecting bluetooth"}));
         }else{
-            bluetoothSerial.connect("20:16:06:15:47:03")
+            bluetoothSerial.connect(option.key)
                 .then((res) => {
                     this.setState({text:"success"});
                 })
@@ -126,7 +150,15 @@ export default class AwesomeProject extends Component {
         </View>;
         switch (this.state.selected){
             case 0:
-                view=<InitialScene command={this.state.command} text={this.state.text} handleLearn={this.handleLearn} handleControl={this.handleControl} createConnection={this.createConnection}/>
+                view=<InitialScene
+                    devices={this.state.devices}
+                    command={this.state.command}
+                    text={this.state.text}
+                    handleLearn={this.handleLearn}
+                    handleControl={this.handleControl}
+                    createConnection={this.createConnection}
+                    searchPairedDevices={this.searchPairedDevices}
+                />
                 break;
             case 1:
                 view=<Sender goToInitialScene={this.goToInitialScene} sendData={this.sendData} />
@@ -142,39 +174,5 @@ export default class AwesomeProject extends Component {
         );
     }
 }
-
-const styles = StyleSheet.create({
-    learningButton:{
-        fontSize: 40,
-        textAlign: 'center',
-        margin: 100,
-        marginTop:200
-    },
-    controlButton:{
-        fontSize: 40,
-        textAlign: 'center',
-        color: '#333333'
-    },
-    remoteButton:{
-        //numbers from 1 to 10
-    },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF'
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 100,
-    marginTop:250
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5
-  }
-});
 
 AppRegistry.registerComponent('AwesomeProject', () => AwesomeProject);
